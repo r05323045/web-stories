@@ -1,9 +1,12 @@
 <template>
   <div class="home">
     <div ref="progress-container" class="progress-container">
-      <div style="animation-duration: 1s" class="progress"></div>
-      <div style="animation-duration: 2s" class="progress"></div>
-      <div style="animation-duration: 3s" class="progress"></div>
+      <div
+        v-for="story in stories"
+        :key="story.id"
+        :style="{'animation-duration': `${story.duration}ms`}"
+        class="progress">
+      </div>
     </div>
     <Story
       @click.native="pauseStories"
@@ -25,6 +28,7 @@ export default {
   },
   data () {
     return {
+      allStories: [],
       stories: [],
       allProgress: [],
       currentProgress: {},
@@ -36,20 +40,41 @@ export default {
     }
   },
   mounted () {
-    this.stories = getStories().slice(0, 3)
-    this.allProgress = Array.from(this.$refs['progress-container'].children)
-    this.allProgress.map(el => el.addEventListener('animationend', this.watchStories, false))
-    this.watchStories()
+    this.allStories = getStories()
+    this.stories = this.randomStories(6)
+    this.$nextTick(() => {
+      this.allProgress = Array.from(this.$refs['progress-container'].children)
+      this.allProgress.map(el => el.addEventListener('animationend', this.watchStories, false))
+      this.watchStories()
+    })
   },
   methods: {
     /*
     clickStory () {
       this.storyNum += 1
-      if (this.storyNum === this.stories.length) {
+      if (this.storyNum === this.allStories.length) {
         this.storyNum = 0
       }
     },
     */
+    randomStories (numOfShown) {
+      const arr = []
+      for (let i = 0; i < this.allStories.length; i++) {
+        for (let j = 0; j < this.allStories[i].weight; j++) {
+          arr.push(i)
+        }
+      }
+      const result = []
+      for (let i = 0; i < numOfShown; i++) {
+        const storyIndex = arr[Math.floor(Math.random() * arr.length)]
+        if (result.map(r => r.id).indexOf(this.allStories[storyIndex].id) > -1) {
+          i -= 1
+        } else {
+          result.push(this.allStories[storyIndex])
+        }
+      }
+      return result
+    },
     pauseStories () {
       if (!this.pause) {
         this.$refs['progress-container'].children.forEach(el => {
@@ -71,19 +96,15 @@ export default {
         this.lastProgress = this.allProgress[this.currentIndex + 1]
       }
       if (this.lastProgress) {
-        this.currentIndex = this.allProgress.indexOf(this.lastProgress)
-        if (this.currentIndex === this.allProgress.length - 1) {
-          this.allProgress.forEach(el => {
-            el.style['animation-play-state'] = 'paused'
-          })
-        } else if (this.currentIndex < this.allProgress.length) {
+        this.currentIndex = this.allProgress.indexOf(this.currentProgress)
+        if (this.currentIndex < this.allProgress.length) {
           this.currentProgress = this.allProgress[this.currentIndex + 1]
           this.storyNum = this.currentIndex + 1
         }
         this.lastProgress.classList.remove('active')
         this.lastProgress.classList.add('passed')
       }
-      if (!Object.keys(this.currentProgress).length) {
+      if (!this.currentProgress || !Object.keys(this.currentProgress).length) {
         this.currentIndex = -1
         this.allProgress.map((el) => {
           el.classList.remove('active')
