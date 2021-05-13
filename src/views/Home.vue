@@ -1,12 +1,12 @@
 <template>
   <div class="home">
     <div ref="progress-container" class="progress-container">
+      <div style="animation-duration: 1s" class="progress"></div>
       <div style="animation-duration: 2s" class="progress"></div>
-      <div style="animation-duration: 1s" class="progress"></div>
-      <div style="animation-duration: 1s" class="progress"></div>
+      <div style="animation-duration: 3s" class="progress"></div>
     </div>
     <Story
-      @click.native="clickStory"
+      @click.native="pauseStories"
       v-show="storyNum === index"
       :story="story"
       v-for="(story, index) in stories"
@@ -26,42 +26,73 @@ export default {
   data () {
     return {
       stories: [],
-      progress: [],
-      storyNum: 0
+      allProgress: [],
+      currentProgress: {},
+      lastProgress: {},
+      currentIndex: -1,
+      storyNum: 0,
+      watchNext: false,
+      pause: false
     }
   },
   mounted () {
-    this.stories = getStories()
-    this.progress = Array.from(this.$refs['progress-container'].children)
-    this.progress.map(el => el.addEventListener('animationend', this.playNext, false))
-    this.playNext()
+    this.stories = getStories().slice(0, 3)
+    this.allProgress = Array.from(this.$refs['progress-container'].children)
+    this.allProgress.map(el => el.addEventListener('animationend', this.watchStories, false))
+    this.watchStories()
   },
   methods: {
+    /*
     clickStory () {
       this.storyNum += 1
       if (this.storyNum === this.stories.length) {
         this.storyNum = 0
       }
     },
-    playNext (e) {
-      const current = e && e.target
-      let next
-      if (current) {
-        const currentIndex = this.progress.indexOf(current)
-        if (currentIndex < this.progress.length) {
-          next = this.progress[currentIndex + 1]
-        }
-        current.classList.remove('active')
-        current.classList.add('passed')
+    */
+    pauseStories () {
+      if (!this.pause) {
+        this.$refs['progress-container'].children.forEach(el => {
+          el.style['animation-play-state'] = 'paused'
+        })
+        this.pause = !this.pause
+      } else {
+        this.watchStories()
+        this.pause = !this.pause
       }
-      if (!next) {
-        this.progress.map((el) => {
+    },
+    watchStories (e) {
+      this.allProgress.forEach(el => {
+        el.style['animation-play-state'] = 'running'
+      })
+      if (!this.pause) {
+        this.lastProgress = e && e.target
+      } else {
+        this.lastProgress = this.allProgress[this.currentIndex + 1]
+      }
+      if (this.lastProgress) {
+        this.currentIndex = this.allProgress.indexOf(this.lastProgress)
+        if (this.currentIndex === this.allProgress.length - 1) {
+          this.allProgress.forEach(el => {
+            el.style['animation-play-state'] = 'paused'
+          })
+        } else if (this.currentIndex < this.allProgress.length) {
+          this.currentProgress = this.allProgress[this.currentIndex + 1]
+          this.storyNum = this.currentIndex + 1
+        }
+        this.lastProgress.classList.remove('active')
+        this.lastProgress.classList.add('passed')
+      }
+      if (!Object.keys(this.currentProgress).length) {
+        this.currentIndex = -1
+        this.allProgress.map((el) => {
           el.classList.remove('active')
           el.classList.remove('passed')
         })
-        next = this.progress[0]
+        this.currentProgress = this.allProgress[0]
+        this.storyNum = 0
       }
-      next.classList.add('active')
+      this.currentProgress.classList.add('active')
     }
   }
 }
@@ -97,7 +128,7 @@ export default {
       );
       background-repeat: no-repeat;
       background-size: 200%;
-      background-color: #666;
+      background-color: #fff;
       background-position: 100% 50%;
       animation-timing-function: linear;
       animation-delay: .2s;
