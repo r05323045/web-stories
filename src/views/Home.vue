@@ -1,17 +1,49 @@
 <template>
   <div class="home">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Story
+      @click.native="clickStory"
+      v-show="storyNum === index"
+      :story="story"
+      v-for="(story, index) in stories"
+      :key="story.id"
+    />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import Story from '@/components/Story.vue'
+import { getStories } from '@/stories-api.js'
 
 export default {
-  name: 'Home',
   components: {
-    HelloWorld
+    Story
+  },
+  data () {
+    return {
+      stories: [],
+      storyNum: 0
+    }
+  },
+  mounted () {
+    this.stories = getStories()
+  },
+  methods: {
+    clickStory () {
+      this.storyNum += 1
+      if (this.storyNum === this.stories.length) {
+        this.storyNum = 0
+      }
+    }
   }
 }
 </script>
+<style lang="scss">
+.home {
+  width: 100%;
+  height: 100vh;
+  #stories {
+    width: 100%;
+    height: 100vh;
+  }
+}
+</style>
