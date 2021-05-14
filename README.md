@@ -1,6 +1,6 @@
 # web-stories
 
-### [Demo](r05323045.github.io/web-stories/)
+### [Demo](https://r05323045.github.io/web-stories/)
 
 ### How to use
 
@@ -30,5 +30,5 @@ npm run serve
 5. 權重高之動態將有將對應被抽到的機會數量，完成動態權重需求
 6. 依照 Stories design 畫面，照片使用 animation 與 transform: scale 製作 zoom in 效果，此外，參考 instagram 之設計，在長按暫停 Story 時，暫停此放大效果。
 
----
+Thanks for your reading!
 
