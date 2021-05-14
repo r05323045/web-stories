@@ -14,6 +14,7 @@
       <Story
         v-show="storyNum === index"
         :story="story"
+        :action="action"
         v-for="(story, index) in stories"
         :key="story.id"
         :style="{'background': `${story.imageUrl === 'https://www.colorhexa.com/666666.png' ? '#666' : 'none'}`}"

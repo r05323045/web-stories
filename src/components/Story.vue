@@ -1,6 +1,6 @@
 <template>
   <div class="story">
-    <div class="story-image" :style="{'background-image': `url(${story.imageUrl})`}"></div>
+    <div ref="story-image" class="story-image" :style="{'background-image': `url(${story.imageUrl})`}"></div>
     <div class="left-side"></div>
     <div class="right-side"></div>
     <div class="story__text">
@@ -12,9 +12,18 @@
 <script>
 export default {
   props: {
-    story: Object
+    story: Object,
+    action: String
   },
-  methods: {}
+  watch: {
+    action () {
+      if (this.action === 'pause') {
+        this.$refs['story-image'].style['animation-play-state'] = 'paused'
+      } else {
+        this.$refs['story-image'].style['animation-play-state'] = 'running'
+      }
+    }
+  }
 }
 </script>
 
@@ -44,6 +53,7 @@ export default {
     }
   }
   .left-side {
+    z-index: 2;
     position: absolute;
     top: 0;
     left: 0;
@@ -51,6 +61,7 @@ export default {
     width: 50%;
   }
   .right-side {
+    z-index: 2;
     position: absolute;
     top: 0;
     left: 50%;
