@@ -10,6 +10,7 @@ html, body {
   height: 100vh;
 }
 #app {
-  height: 100%;
+  height: 100vh;
+  background: #000000;
 }
 </style>

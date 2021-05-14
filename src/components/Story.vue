@@ -1,5 +1,8 @@
 <template>
-  <div class="story" :style="{ 'background-image': `url(${story.imageUrl})` }">
+  <div class="story">
+    <div class="story-image" :style="{'background-image': `url(${story.imageUrl})`, 'transition': `all ${story.duration}ms`}"></div>
+    <div class="left-side" @click.stop="$emit('lastStory')"></div>
+    <div class="right-side" @click.stop="$emit('nextStory')"></div>
     <div class="story__text">
       {{ story.text }}
     </div>
@@ -10,7 +13,8 @@
 export default {
   props: {
     story: Object
-  }
+  },
+  methods: {}
 }
 </script>
 
@@ -18,9 +22,39 @@ export default {
 .story {
   width: 100%;
   height: 100%;
-  background-size: cover;
-  background-position: center;
   position: relative;
+  .story-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: 100%;
+    background-position: cover cover;
+    animation: zoomin 7s ease-in alternate;
+  }
+  @keyframes zoomin {
+    0% {
+       background-size: 100% 100%;
+    }
+    100% {
+       background-size: 110% 110%;
+    }
+  }
+  .left-side {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 50%;
+  }
+  .right-side {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 100%;
+    width: 50%;
+  }
   .story__text {
     position: absolute;
     left: 0;

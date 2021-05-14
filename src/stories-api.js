@@ -1,3 +1,12 @@
+/* eslint-disable keyword-spacing */
+/* eslint-disable semi */
+/* eslint-disable template-curly-spacing */
+/* eslint-disable space-before-function-paren */
+/* eslint-disable camelcase */
+/* eslint-disable comma-dangle */
+/* eslint-disable indent */
+/* eslint-disable no-tabs */
+
 const _stories = [
 	{
 		id: '84b496feea04306e1bf8ec5ff8e72a60',
