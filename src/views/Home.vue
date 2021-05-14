@@ -19,6 +19,8 @@
         @nextStory="nextStory"
         @mousedown.native.prevent="pauseStories"
         @mouseup.native.prevent="continueStories"
+        @touchstart.native.prevent="pauseStories"
+        @touchend.native.prevent="continueStories"
       />
     </div>
   </div>

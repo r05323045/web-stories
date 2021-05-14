@@ -22,6 +22,8 @@ export default {
 .story {
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  overflow: hidden;
   position: relative;
   .story-image {
     position: absolute;
@@ -29,16 +31,16 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: 100%;
-    background-position: center;
-    animation: zoomin 7s ease-in alternate;
+    background-size: cover;
+    background-position: cover;
+    animation: zoomin 6s ease-in alternate;
   }
   @keyframes zoomin {
     0% {
-      background-size: 100% 100%;
+      transform: scale(1, 1);
     }
     100% {
-      background-size: 110% 110%;
+      transform: scale(1.1, 1.1);
     }
   }
   .left-side {
