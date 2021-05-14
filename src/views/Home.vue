@@ -5,9 +5,10 @@
         <div
           v-for="story in stories"
           :key="story.id"
-          :style="{'animation-duration': `${story.duration}ms`}"
           class="progress"
-          :class="{'active': story.active, 'passed': story.passed}">
+          :style="{'animation-duration': `${story.duration}ms`}"
+          :class="{'active': story.active, 'passed': story.passed}"
+        >
         </div>
       </div>
       <Story
@@ -15,8 +16,7 @@
         :story="story"
         v-for="(story, index) in stories"
         :key="story.id"
-        @lastStory="lastStory"
-        @nextStory="nextStory"
+        :style="{'background': `${story.imageUrl === 'https://www.colorhexa.com/666666.png' ? '#666' : 'none'}`}"
         @mousedown.native.prevent="pauseStories"
         @mouseup.native.prevent="continueStories"
         @touchstart.native.prevent="pauseStories"
@@ -28,7 +28,7 @@
 
 <script>
 import Story from '@/components/Story.vue'
-import { getStories } from '@/stories-api.js'
+import { getStoriesMeta, ajaxGetStoryByIdUnstable } from '@/stories-api.js'
 
 export default {
   components: {
@@ -36,6 +36,8 @@ export default {
   },
   data () {
     return {
+      weightInfo: {},
+      storiesId: [],
       allStories: [],
       stories: [],
       allProgress: [],
@@ -49,58 +51,77 @@ export default {
     }
   },
   mounted () {
-    this.allStories = getStories()
-    this.stories = this.randomStories(6)
-    this.stories = this.stories.map(s => ({
-      ...s,
-      active: false,
-      passed: false
-    }))
+    this.weightInfo = getStoriesMeta()
+    this.getfakeStories()
     this.$nextTick(() => {
       this.allProgress = Array.from(this.$refs['progress-container'].children)
       this.allProgress.map(el => el.addEventListener('animationend', this.watchStories, false))
-      this.watchStories()
+      this.fetchStory()
     })
   },
   methods: {
+    getfakeStories () {
+      this.storiesId = this.randomStories(6)
+      this.stories = this.storiesId.map(storyId => ({
+        id: storyId,
+        imageUrl: 'https://www.colorhexa.com/666666.png',
+        text: 'Loading...',
+        duration: 3000,
+        weight: 1,
+        active: false,
+        passed: false,
+        gotData: false
+      }))
+    },
+    async fetchStory () {
+      this.pauseStories()
+      const story = await ajaxGetStoryByIdUnstable(this.storiesId[this.currentIndex])
+      if (!story) {
+        return this.fetchStory()
+      }
+      this.stories[this.stories.findIndex(s => s.id === story.id)].imageUrl = story.imageUrl
+      this.stories[this.stories.findIndex(s => s.id === story.id)].text = story.text
+      this.stories[this.stories.findIndex(s => s.id === story.id)].duration = story.duration
+      this.stories[this.stories.findIndex(s => s.id === story.id)].weight = story.weight
+      this.stories[this.stories.findIndex(s => s.id === story.id)].gotData = true
+      this.continueStories()
+    },
     randomStories (numOfShown) {
       const arr = []
-      for (let i = 0; i < this.allStories.length; i++) {
-        for (let j = 0; j < this.allStories[i].weight; j++) {
-          arr.push(i)
+      for (let i = 0; i < this.weightInfo.idList.length; i++) {
+        for (let j = 0; j < this.weightInfo.weightList[i]; j++) {
+          arr.push(this.weightInfo.idList[i])
         }
       }
       const result = []
       for (let i = 0; i < numOfShown; i++) {
-        const storyIndex = arr[Math.floor(Math.random() * arr.length)]
-        if (result.map(r => r.id).indexOf(this.allStories[storyIndex].id) > -1) {
+        const storyId = arr[Math.floor(Math.random() * arr.length)]
+        if (result.indexOf(storyId) > -1) {
           i -= 1
         } else {
-          result.push(this.allStories[storyIndex])
+          result.push(storyId)
         }
       }
       return result
     },
     pauseStories (e) {
-      this.pauseTime = new Date().getTime()
+      if (e) {
+        this.pauseTime = new Date().getTime()
+      }
       this.action = 'pause'
       this.allProgress.forEach(el => {
         el.style['animation-play-state'] = 'paused'
       })
     },
     continueStories (e) {
-      this.action = 'continue'
-      this.watchStories()
-    },
-    nextStory () {
-      if (new Date().getTime() - this.pauseTime < 200) {
+      if (e && e.path[0].classList.contains('right-side') && new Date().getTime() - this.pauseTime < 200) {
         this.action = 'next'
         this.watchStories()
-      }
-    },
-    lastStory () {
-      if (new Date().getTime() - this.pauseTime < 200) {
+      } else if (e && e.path[0].classList.contains('left-side') && new Date().getTime() - this.pauseTime < 200) {
         this.action = 'last'
+        this.watchStories()
+      } else {
+        this.action = 'continue'
         this.watchStories()
       }
     },
@@ -134,17 +155,18 @@ export default {
       }
       this.action = ''
       if (!this.currentProgress) { // watch first story
+        if (!this.stories[this.currentIndex].gotData) {
+          this.fetchStory()
+        }
         this.currentProgress = this.allProgress[0]
-        this.currentIndex = 0
         this.storyNum = 0
-        this.stories.map(story => {
-          story.active = false
-          story.passed = false
-        })
         this.stories[0].active = true
       } else { // after watching first story
         this.currentIndex = this.allProgress.indexOf(this.currentProgress) + 1
         if (this.currentIndex < this.allProgress.length) {
+          if (!this.stories[this.currentIndex].gotData) {
+            this.fetchStory()
+          }
           this.currentProgress = this.allProgress[this.currentIndex]
           this.storyNum = this.currentIndex
           this.stories[this.storyNum - 1].active = false
@@ -206,6 +228,7 @@ export default {
         background-position: 100% 50%;
         animation-timing-function: linear;
         animation-delay: .2s;
+        animation-duration: 3s;
       }
       .progress.active {
         animation-name: Loader;

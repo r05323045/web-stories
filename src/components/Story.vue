@@ -1,8 +1,8 @@
 <template>
   <div class="story">
-    <div class="story-image" :style="{'background-image': `url(${story.imageUrl})`, 'transition': `all ${story.duration}ms`}"></div>
-    <div class="left-side" @click.stop="$emit('lastStory')"></div>
-    <div class="right-side" @click.stop="$emit('nextStory')"></div>
+    <div class="story-image" :style="{'background-image': `url(${story.imageUrl})`}"></div>
+    <div class="left-side"></div>
+    <div class="right-side"></div>
     <div class="story__text">
       {{ story.text }}
     </div>
