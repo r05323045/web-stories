@@ -38,15 +38,12 @@ export default {
     return {
       weightInfo: {},
       storiesId: [],
-      allStories: [],
       stories: [],
       allProgress: [],
       currentProgress: {},
-      lastProgress: {},
       currentIndex: 0,
       pauseTime: 0,
       storyNum: 0,
-      watchNext: false,
       action: ''
     }
   },
@@ -116,14 +113,12 @@ export default {
     continueStories (e) {
       if (e && e.path[0].classList.contains('right-side') && new Date().getTime() - this.pauseTime < 200) {
         this.action = 'next'
-        this.watchStories()
       } else if (e && e.path[0].classList.contains('left-side') && new Date().getTime() - this.pauseTime < 200) {
         this.action = 'last'
-        this.watchStories()
       } else {
         this.action = 'continue'
-        this.watchStories()
       }
+      this.watchStories()
     },
     watchStories (e) {
       this.allProgress.forEach(el => {

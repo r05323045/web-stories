@@ -33,7 +33,7 @@ export default {
     height: 100%;
     background-size: cover;
     background-position: cover;
-    animation: zoomin 6s ease-in alternate;
+    animation: zoomin 8s ease-in alternate;
   }
   @keyframes zoomin {
     0% {
