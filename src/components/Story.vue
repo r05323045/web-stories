@@ -30,15 +30,15 @@ export default {
     width: 100%;
     height: 100%;
     background-size: 100%;
-    background-position: cover cover;
+    background-position: center;
     animation: zoomin 7s ease-in alternate;
   }
   @keyframes zoomin {
     0% {
-       background-size: 100% 100%;
+      background-size: 100% 100%;
     }
     100% {
-       background-size: 110% 110%;
+      background-size: 110% 110%;
     }
   }
   .left-side {
