@@ -133,15 +133,26 @@ export default {
       }
     },
     randomStories (numOfShown) {
-      const arr = []
+      const sumOfWeight = this.weightInfo.weightList.reduce((a, b) => a + b, 0)
+      const weightedArray = []
       for (let i = 0; i < this.weightInfo.idList.length; i++) {
-        for (let j = 0; j < this.weightInfo.weightList[i]; j++) {
-          arr.push(this.weightInfo.idList[i])
-        }
+        weightedArray.push({
+          weight: this.weightInfo.weightList[i] / sumOfWeight,
+          id: this.weightInfo.idList[i]
+        })
       }
       const result = []
       for (let i = 0; i < numOfShown; i++) {
-        const storyId = arr[Math.floor(Math.random() * arr.length)]
+        let storyId
+        const randomNum = Math.random()
+        let threshold = 0
+        for (let j = 0; j < weightedArray.length; j++) {
+          threshold += parseFloat(weightedArray[j].weight)
+          if (threshold > randomNum) {
+            storyId = weightedArray[j].id
+            break
+          }
+        }
         if (result.indexOf(storyId) > -1) {
           i -= 1
         } else {
