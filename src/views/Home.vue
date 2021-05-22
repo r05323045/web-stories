@@ -70,7 +70,7 @@ export default {
     this.$nextTick(() => {
       this.allProgress = Array.from(this.$refs['progress-container'].children)
       this.allProgress.map(el => el.addEventListener('animationend', this.watchStories, false))
-      this.fetchStory()
+      this.getStory()
     })
   },
   methods: {
@@ -87,18 +87,33 @@ export default {
         gotData: false
       }))
     },
-    async fetchStory () {
+    async getStory () {
       this.pauseStories()
-      const story = await ajaxGetStoryByIdUnstable(this.storiesId[this.currentIndex])
+      await this.fetchStory(this.currentIndex)
+    },
+    async fetchStory (targetIndex) {
+      const targetId = this.storiesId[targetIndex]
+      const story = await ajaxGetStoryByIdUnstable(targetId)
       if (!story) {
-        return this.fetchStory()
+        return this.fetchStory(targetIndex)
       }
-      this.stories[this.stories.findIndex(s => s.id === story.id)].imageUrl = story.imageUrl
-      this.stories[this.stories.findIndex(s => s.id === story.id)].text = story.text
-      this.stories[this.stories.findIndex(s => s.id === story.id)].duration = story.duration
-      this.stories[this.stories.findIndex(s => s.id === story.id)].weight = story.weight
-      this.stories[this.stories.findIndex(s => s.id === story.id)].gotData = true
+      this.stories[this.stories.findIndex(s => s.id === targetId)].imageUrl = story.imageUrl
+      this.stories[this.stories.findIndex(s => s.id === targetId)].text = story.text
+      this.stories[this.stories.findIndex(s => s.id === targetId)].duration = story.duration
+      this.stories[this.stories.findIndex(s => s.id === targetId)].weight = story.weight
+      this.stories[this.stories.findIndex(s => s.id === targetId)].gotData = true
       this.continueStories()
+      let nextTargetIndex
+      for (let i = targetIndex; i < this.storiesId.length; i++) {
+        if (!this.stories[this.stories.findIndex(s => s.id === this.storiesId[i])].gotData) {
+          nextTargetIndex = i
+          break
+        }
+        nextTargetIndex = false
+      }
+      if (nextTargetIndex) {
+        return this.fetchStory(nextTargetIndex)
+      }
     },
     randomStories (numOfShown) {
       const arr = []
@@ -163,7 +178,7 @@ export default {
       this.action = ''
       if (!this.currentProgress) { // watch first story
         if (!this.stories[this.currentIndex].gotData) {
-          this.fetchStory()
+          this.getStory()
         }
         this.currentProgress = this.allProgress[0]
         this.storyNum = 0
@@ -172,7 +187,7 @@ export default {
         this.currentIndex = this.allProgress.indexOf(this.currentProgress) + 1
         if (this.currentIndex < this.allProgress.length) {
           if (!this.stories[this.currentIndex].gotData) {
-            this.fetchStory()
+            this.getStory()
           }
           this.currentProgress = this.allProgress[this.currentIndex]
           this.storyNum = this.currentIndex
