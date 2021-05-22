@@ -62,14 +62,14 @@ export default {
     this.weightInfo = getStoriesMeta()
     this.getfakeStories()
     window.addEventListener('keydown', event => {
-      if (event.keyCode === 32) {
+      if (event.key === ' ' || event.key === 'Spacebar') {
         this.pauseStories()
       }
     })
     window.addEventListener('keyup', event => {
-      if (event.keyCode === 32) {
+      if (event.key === ' ' || event.key === 'Spacebar') {
         this.continueStories()
-      } else if (event.keyCode === 37) {
+      } else if (event.key === 'ArrowLeft') {
         this.stories[this.storyNum].passed = false
         this.stories[this.storyNum].active = false
         if (this.stories[this.storyNum - 1]) {
@@ -77,7 +77,7 @@ export default {
         }
         this.currentProgress = this.currentIndex === 0 ? undefined : this.allProgress[this.storyNum - 2]
         this.watchStories()
-      } else if (event.keyCode === 39) {
+      } else if (event.key === 'ArrowRight') {
         this.stories[this.storyNum].active = false
         this.stories[this.storyNum].passed = true
         this.currentProgress = this.allProgress[this.storyNum]
