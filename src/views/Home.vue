@@ -14,7 +14,7 @@
       <Story
         v-show="storyNum === index"
         :story="story"
-        :action="action"
+        :pause="pause"
         v-for="(story, index) in stories"
         :key="story.id"
         :style="{'background': `${story.imageUrl === 'https://www.colorhexa.com/666666.png' ? '#666' : 'none'}`}"
@@ -45,7 +45,7 @@ export default {
       currentIndex: 0,
       pauseTime: 0,
       storyNum: 0,
-      action: ''
+      pause: false
     }
   },
   mounted () {
@@ -60,10 +60,17 @@ export default {
       if (event.keyCode === 32) {
         this.continueStories()
       } else if (event.keyCode === 37) {
-        this.action = 'last'
+        this.stories[this.storyNum].passed = false
+        this.stories[this.storyNum].active = false
+        if (this.stories[this.storyNum - 1]) {
+          this.stories[this.storyNum - 1].passed = false
+        }
+        this.currentProgress = this.currentIndex === 0 ? undefined : this.allProgress[this.storyNum - 2]
         this.watchStories()
       } else if (event.keyCode === 39) {
-        this.action = 'next'
+        this.stories[this.storyNum].active = false
+        this.stories[this.storyNum].passed = true
+        this.currentProgress = this.allProgress[this.storyNum]
         this.watchStories()
       }
     })
@@ -93,7 +100,7 @@ export default {
     },
     async fetchStory (targetIndex) {
       const targetId = this.storiesId[targetIndex]
-      const story = await ajaxGetStoryByIdUnstable(targetId)
+      const story = this.stories[this.stories.findIndex(s => s.id === targetId)].gotData ? this.stories[this.stories.findIndex(s => s.id === targetId)] : await ajaxGetStoryByIdUnstable(targetId)
       if (!story) {
         return this.fetchStory(targetIndex)
       }
@@ -137,18 +144,25 @@ export default {
       if (e) {
         this.pauseTime = new Date().getTime()
       }
-      this.action = 'pause'
+      this.pause = true
       this.allProgress.forEach(el => {
         el.style['animation-play-state'] = 'paused'
       })
     },
     continueStories (e) {
       if (e && e.path[0].classList.contains('right-side') && new Date().getTime() - this.pauseTime < 200) {
-        this.action = 'next'
+        this.stories[this.storyNum].active = false
+        this.stories[this.storyNum].passed = true
+        this.currentProgress = this.allProgress[this.storyNum]
       } else if (e && e.path[0].classList.contains('left-side') && new Date().getTime() - this.pauseTime < 200) {
-        this.action = 'last'
+        this.stories[this.storyNum].passed = false
+        this.stories[this.storyNum].active = false
+        if (this.stories[this.storyNum - 1]) {
+          this.stories[this.storyNum - 1].passed = false
+        }
+        this.currentProgress = this.currentIndex === 0 ? undefined : this.allProgress[this.storyNum - 2]
       } else {
-        this.action = 'continue'
+        this.currentProgress = this.allProgress[this.storyNum - 1]
       }
       this.watchStories()
     },
@@ -156,26 +170,7 @@ export default {
       this.allProgress.forEach(el => {
         el.style['animation-play-state'] = 'running'
       })
-      switch (this.action) {
-        case 'continue':
-          this.currentProgress = this.allProgress[this.storyNum - 1]
-          break
-        case 'next':
-          this.stories[this.storyNum].active = false
-          this.stories[this.storyNum].passed = true
-          this.currentProgress = this.allProgress[this.storyNum]
-          break
-        case 'last':
-          this.stories[this.storyNum].passed = false
-          this.stories[this.storyNum].active = false
-          this.stories[this.storyNum - 1].passed = false
-          this.currentProgress = this.currentIndex === 0 ? undefined : this.allProgress[this.storyNum - 2]
-          break
-        default:
-          this.currentProgress = e && e.target
-          break
-      }
-      this.action = ''
+      this.pause = false
       if (!this.currentProgress) { // watch first story
         if (!this.stories[this.currentIndex].gotData) {
           this.getStory()

@@ -1,6 +1,6 @@
 <template>
   <div class="story">
-    <img ref="story-image" class="story-image" :src="story.imageUrl">
+    <img ref="story-image" class="story-image" :src="story.imageUrl" :style="{'animation-play-state': `${this.pause ? 'paused' : 'running'}`}">
     <div class="left-side"></div>
     <div class="right-side"></div>
     <div class="story__text">
@@ -13,16 +13,7 @@
 export default {
   props: {
     story: Object,
-    action: String
-  },
-  watch: {
-    action () {
-      if (this.action === 'pause') {
-        this.$refs['story-image'].style['animation-play-state'] = 'paused'
-      } else {
-        this.$refs['story-image'].style['animation-play-state'] = 'running'
-      }
-    }
+    pause: Boolean
   }
 }
 </script>
