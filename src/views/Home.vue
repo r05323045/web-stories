@@ -51,6 +51,22 @@ export default {
   mounted () {
     this.weightInfo = getStoriesMeta()
     this.getfakeStories()
+    window.addEventListener('keydown', event => {
+      if (event.keyCode === 32) {
+        this.pauseStories()
+      }
+    })
+    window.addEventListener('keyup', event => {
+      if (event.keyCode === 32) {
+        this.continueStories()
+      } else if (event.keyCode === 37) {
+        this.action = 'last'
+        this.watchStories()
+      } else if (event.keyCode === 39) {
+        this.action = 'next'
+        this.watchStories()
+      }
+    })
     this.$nextTick(() => {
       this.allProgress = Array.from(this.$refs['progress-container'].children)
       this.allProgress.map(el => el.addEventListener('animationend', this.watchStories, false))
