@@ -12,12 +12,20 @@
         </div>
       </div>
       <Story
-        v-show="storyNum === index"
+        v-show="storyNum === index && story.gotData"
         :story="story"
         :pause="pause"
         v-for="(story, index) in stories"
         :key="story.id"
-        :style="{'background': `${story.imageUrl === 'https://www.colorhexa.com/666666.png' ? '#666' : 'none'}`}"
+        @clickDownLeftSide="pauseStories"
+        @clickUpLeftSide="clickLeft"
+        @clickDownRightSide="pauseStories"
+        @clickUpRightSide="clickRight"
+      />
+      <fake-story
+        v-show="storyNum === index && !story.gotData"
+        v-for="(story, index) in stories"
+        :key="`${story.id}-fake`"
         @clickDownLeftSide="pauseStories"
         @clickUpLeftSide="clickLeft"
         @clickDownRightSide="pauseStories"
@@ -29,11 +37,13 @@
 
 <script>
 import Story from '@/components/Story.vue'
+import FakeStory from '@/components/FakeStory.vue'
 import { getStoriesMeta, ajaxGetStoryByIdUnstable } from '@/stories-api.js'
 
 export default {
   components: {
-    Story
+    Story,
+    FakeStory
   },
   data () {
     return {

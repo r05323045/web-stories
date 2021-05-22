@@ -1,6 +1,6 @@
 <template>
   <div class="story">
-    <img class="story-image" :src="story.imageUrl" :style="{'animation-play-state': `${this.pause ? 'paused' : 'running'}`}">
+    <img class="story-image" src="https://www.colorhexa.com/666666.png">
     <div
       @mousedown.prevent="$emit('clickDownLeftSide')"
       @mouseup.prevent="$emit('clickUpLeftSide')"
@@ -13,11 +13,8 @@
       @mouseup.prevent="$emit('clickUpRightSide')"
       @touchstart.prevent="$emit('clickDownRightSide')"
       @touchend.prevent="$emit('clickUpRightSide')"
-      class="right-side"
-    ></div>
-    <div class="story__text">
-      {{ story.text }}
-    </div>
+      class="right-side"></div>
+    <div class="story__text">Loading...</div>
   </div>
 </template>
 
