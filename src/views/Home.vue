@@ -18,10 +18,10 @@
         v-for="(story, index) in stories"
         :key="story.id"
         :style="{'background': `${story.imageUrl === 'https://www.colorhexa.com/666666.png' ? '#666' : 'none'}`}"
-        @mousedown.native.prevent="pauseStories"
-        @mouseup.native.prevent="continueStories"
-        @touchstart.native.prevent="pauseStories"
-        @touchend.native.prevent="continueStories"
+        @clickDownLeftSide="pauseStories"
+        @clickUpLeftSide="clickLeft"
+        @clickDownRightSide="pauseStories"
+        @clickUpRightSide="clickRight"
       />
     </div>
   </div>
@@ -141,20 +141,24 @@ export default {
       return result
     },
     pauseStories (e) {
-      if (e) {
-        this.pauseTime = new Date().getTime()
-      }
+      this.pauseTime = new Date().getTime()
       this.pause = true
       this.allProgress.forEach(el => {
         el.style['animation-play-state'] = 'paused'
       })
     },
-    continueStories (e) {
-      if (e && e.path[0].classList.contains('right-side') && new Date().getTime() - this.pauseTime < 200) {
+    clickRight (e) {
+      if (new Date().getTime() - this.pauseTime < 200) {
         this.stories[this.storyNum].active = false
         this.stories[this.storyNum].passed = true
         this.currentProgress = this.allProgress[this.storyNum]
-      } else if (e && e.path[0].classList.contains('left-side') && new Date().getTime() - this.pauseTime < 200) {
+      } else {
+        this.currentProgress = this.allProgress[this.storyNum - 1]
+      }
+      this.watchStories()
+    },
+    clickLeft (e) {
+      if (new Date().getTime() - this.pauseTime < 200) {
         this.stories[this.storyNum].passed = false
         this.stories[this.storyNum].active = false
         if (this.stories[this.storyNum - 1]) {
@@ -164,6 +168,10 @@ export default {
       } else {
         this.currentProgress = this.allProgress[this.storyNum - 1]
       }
+      this.watchStories()
+    },
+    continueStories (e) {
+      this.currentProgress = this.allProgress[this.storyNum - 1]
       this.watchStories()
     },
     watchStories (e) {

@@ -1,8 +1,20 @@
 <template>
   <div class="story">
     <img ref="story-image" class="story-image" :src="story.imageUrl" :style="{'animation-play-state': `${this.pause ? 'paused' : 'running'}`}">
-    <div class="left-side"></div>
-    <div class="right-side"></div>
+    <div
+      @mousedown.prevent="$emit('clickDownLeftSide')"
+      @mouseup.prevent="$emit('clickUpLeftSide')"
+      @touchstart.prevent="$emit('clickDownLeftSide')"
+      @touchend.prevent="$emit('clickUpLeftSide')"
+      class="left-side"
+    ></div>
+    <div
+      @mousedown.prevent="$emit('clickDownRightSide')"
+      @mouseup.prevent="$emit('clickUpRightSide')"
+      @touchstart.prevent="$emit('clickDownRightSide')"
+      @touchend.prevent="$emit('clickUpRightSide')"
+      class="right-side"
+    ></div>
     <div class="story__text">
       {{ story.text }}
     </div>
