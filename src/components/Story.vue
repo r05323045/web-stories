@@ -1,6 +1,6 @@
 <template>
   <div class="story">
-    <div ref="story-image" class="story-image" :style="{'background-image': `url(${story.imageUrl})`}"></div>
+    <img ref="story-image" class="story-image" :src="story.imageUrl">
     <div class="left-side"></div>
     <div class="right-side"></div>
     <div class="story__text">
@@ -40,8 +40,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: cover;
+    object-fit: cover;
     animation: zoomin 8s ease-in alternate;
   }
   @keyframes zoomin {

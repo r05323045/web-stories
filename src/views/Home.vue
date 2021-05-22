@@ -151,15 +151,10 @@ export default {
           this.currentProgress = this.allProgress[this.storyNum]
           break
         case 'last':
-          if (this.stories[this.stories.length - 1].passed === true) {
-            this.stories[this.storyNum].passed = false
-            this.stories[this.storyNum].active = true
-            this.currentProgress = this.allProgress[this.storyNum - 1]
-          } else {
-            this.stories[this.storyNum].passed = false
-            this.stories[this.storyNum].active = false
-            this.currentProgress = this.currentIndex === 0 ? undefined : this.allProgress[this.storyNum - 2]
-          }
+          this.stories[this.storyNum].passed = false
+          this.stories[this.storyNum].active = false
+          this.stories[this.storyNum - 1].passed = false
+          this.currentProgress = this.currentIndex === 0 ? undefined : this.allProgress[this.storyNum - 2]
           break
         default:
           this.currentProgress = e && e.target
