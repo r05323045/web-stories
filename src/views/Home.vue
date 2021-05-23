@@ -144,22 +144,21 @@ export default {
       }
       // Apply the concept of cumulative distribution function of uniform distribution
       const result = []
+      let archivedWeight = 0
       for (let i = 0; i < numOfShown; i++) {
         let storyId
-        const randomNum = Math.random()
+        const randomNum = 0.01
         let threshold = 0
         for (let j = 0; j < weightedArray.length; j++) {
           threshold += parseFloat(weightedArray[j].weight)
-          if (threshold > randomNum) {
+          if (threshold > randomNum * (1 - archivedWeight)) {
             storyId = weightedArray[j].id
+            archivedWeight += weightedArray[j].weight
             break
           }
         }
-        if (result.indexOf(storyId) > -1) {
-          i -= 1
-        } else {
-          result.push(storyId)
-        }
+        weightedArray.splice(weightedArray.findIndex(w => w.id === storyId), 1)
+        result.push(storyId)
       }
       return result
     },
