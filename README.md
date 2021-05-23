@@ -31,7 +31,7 @@ npm run serve
 5. 辨別使用者欲暫停或前往其他 story 的行為 -
   - 紀錄使用者 mousedown/touchstart 至 mouseup/touchend 時間，判斷使用者為點擊或長按暫停 story
 6. 不同權重 story 之選取 -
-  - 設定個別 story 抽中機率為 `story 權重 / 所有權重加總`，使 story 的抽樣機率分佈為均勻分配；在抽樣時先取得 0 - 1 之間的亂數，使用該亂數在累積分佈函數 (CDF) 的位置，完成抽樣。
+  - 設定個別 story 抽中機率為 `story 權重 / 所有權重加總`，使 story 的抽樣機率分佈為均勻分配；在抽樣時先取得 0 - 1 之間的亂數，使用該亂數在累積分佈函數 (CDF) 的位置完成抽樣，且抽中後將 story 自分配中移除，實現不重複抽樣。
 7. 其他畫面設計 - 
   - 依照 Stories design 畫面，照片使用 animation 與 transform: scale 製作 zoom in 效果，此外，參考 instagram 之設計，在長按暫停 story 時，暫停此放大效果。
   - 電腦使用者可透過空白鍵暫停，左右鍵切換不同 story
