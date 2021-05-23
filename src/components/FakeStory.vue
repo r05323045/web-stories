@@ -1,6 +1,5 @@
 <template>
   <div class="story">
-    <img class="story-image" src="https://www.colorhexa.com/666666.png">
     <div
       @mousedown.prevent="$emit('clickDownLeftSide')"
       @mouseup.prevent="$emit('clickUpLeftSide')"
@@ -34,23 +33,7 @@ export default {
   max-width: 100%;
   overflow: hidden;
   position: relative;
-  .story-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    animation: zoomin 8s ease-in alternate;
-  }
-  @keyframes zoomin {
-    0% {
-      transform: scale(1, 1);
-    }
-    100% {
-      transform: scale(1.1, 1.1);
-    }
-  }
+  background: #666;
   .left-side {
     z-index: 2;
     position: absolute;
