@@ -7,7 +7,7 @@
           :key="story.id"
           class="progress"
           :style="{'animation-duration': `${story.duration}ms`}"
-          :class="{'active': story.active, 'passed': story.passed}"
+          :class="{'active': story.active && story.gotData, 'passed': story.passed}"
         >
         </div>
       </div>
@@ -21,6 +21,7 @@
         @clickUpLeftSide="clickLeft"
         @clickDownRightSide="pauseStories"
         @clickUpRightSide="clickRight"
+        @isLoaded="imageIsLoaded"
       />
       <fake-story
         v-show="storyNum === index && !story.gotData"
@@ -91,11 +92,12 @@ export default {
     })
   },
   methods: {
+    // Consider the reactivity of vue.js, the fake data is still necessary although we have the component of fakeStory.
     getfakeStories () {
       this.storiesId = this.randomStories(6)
       this.stories = this.storiesId.map(storyId => ({
         id: storyId,
-        imageUrl: 'https://www.colorhexa.com/666666.png',
+        imageUrl: null,
         text: 'Loading...',
         duration: 3000,
         weight: 1,
@@ -118,7 +120,6 @@ export default {
       this.stories[this.stories.findIndex(s => s.id === targetId)].text = story.text
       this.stories[this.stories.findIndex(s => s.id === targetId)].duration = story.duration
       this.stories[this.stories.findIndex(s => s.id === targetId)].weight = story.weight
-      this.stories[this.stories.findIndex(s => s.id === targetId)].gotData = true
       this.continueStories()
       let nextTargetIndex
       for (let i = targetIndex; i < this.storiesId.length; i++) {
@@ -141,6 +142,7 @@ export default {
           id: this.weightInfo.idList[i]
         })
       }
+      // Apply the concept of cumulative distribution function of uniform distribution
       const result = []
       for (let i = 0; i < numOfShown; i++) {
         let storyId
@@ -200,14 +202,14 @@ export default {
         el.style['animation-play-state'] = 'running'
       })
       this.pause = false
-      if (!this.currentProgress) { // watch first story
+      if (!this.currentProgress) { // When the user at the first story
         if (!this.stories[this.currentIndex].gotData) {
           this.getStory()
         }
         this.currentProgress = this.allProgress[0]
         this.storyNum = 0
         this.stories[0].active = true
-      } else { // after watching first story
+      } else { // When the user at any story except of the first story
         this.currentIndex = this.allProgress.indexOf(this.currentProgress) + 1
         if (this.currentIndex < this.allProgress.length) {
           if (!this.stories[this.currentIndex].gotData) {
@@ -226,6 +228,13 @@ export default {
           })
         }
       }
+    },
+    imageIsLoaded (storyId) {
+      this.stories[this.stories.findIndex(s => s.id === storyId)].gotData = true
+      this.allProgress.forEach(el => {
+        el.style['animation-play-state'] = 'running'
+      })
+      this.pause = false
     }
   }
 }

@@ -1,6 +1,10 @@
 <template>
   <div class="story">
-    <img class="story-image" :src="story.imageUrl" :style="{'animation-play-state': `${this.pause ? 'paused' : 'running'}`}">
+    <img class="story-image"
+      :src="story.imageUrl"
+      :style="{'animation-play-state': `${this.pause ? 'paused' : 'running'}`}"
+      @load="$emit('isLoaded', story.id)"
+    >
     <div
       @mousedown.prevent="$emit('clickDownLeftSide')"
       @mouseup.prevent="$emit('clickUpLeftSide')"
