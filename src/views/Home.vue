@@ -109,6 +109,7 @@ export default {
     async getStory () {
       this.pauseStories()
       await this.fetchStory(this.currentIndex)
+      this.continueStories()
     },
     async fetchStory (targetIndex) {
       const targetId = this.storiesId[targetIndex]
@@ -120,7 +121,6 @@ export default {
       this.stories[this.stories.findIndex(s => s.id === targetId)].text = story.text
       this.stories[this.stories.findIndex(s => s.id === targetId)].duration = story.duration
       this.stories[this.stories.findIndex(s => s.id === targetId)].weight = story.weight
-      this.continueStories()
       let nextTargetIndex
       for (let i = targetIndex; i < this.storiesId.length; i++) {
         if (!this.stories[this.stories.findIndex(s => s.id === this.storiesId[i])].gotData) {
