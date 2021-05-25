@@ -147,7 +147,7 @@ export default {
       let archivedWeight = 0
       for (let i = 0; i < numOfShown; i++) {
         let storyId
-        const randomNum = 0.01
+        const randomNum = Math.random()
         let threshold = 0
         for (let j = 0; j < weightedArray.length; j++) {
           threshold += parseFloat(weightedArray[j].weight)
